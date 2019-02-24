@@ -1,5 +1,5 @@
 <template>
-  <div class="reg-form fr">
+  <div>
     <el-form status-icon ref="form" :model="formData" :rules="rules">
       <el-form-item prop="mobileNum">
         <el-input v-model="formData.mobileNum" autocomplete="off" placeholder="输入手机号码">
@@ -23,16 +23,12 @@
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="submitForm" type="primary" style="width:100%" size="middle">确认</el-button>
+        <el-button @click="submitForm" type="primary" style="width:100%" size="middle">注册</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 <style>
-.reg-form {
-  width: 400px;
-  margin: 10px;
-}
 .fetch-code {
   user-select: none;
   cursor: pointer;
@@ -48,44 +44,47 @@ export default {
   data() {
     const mobileNumValidate = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('手机号不能为空'));
+        return callback(new Error("手机号不能为空"));
       }
       const reg = /^1[34578]\d{9}$/;
       if (reg.test(value)) {
-        if (typeof this.checkMobileNum === 'function') {
+        if (typeof this.checkMobileNum === "function") {
           this.checkMobileNum({ account: value })
-            .then((result) => {
+            .then(result => {
               if (!result.success) {
                 this.canFetchMobileCode = true;
-                this.getCodeMsg = '发送验证码';
+                this.getCodeMsg = "发送验证码";
                 callback();
               } else {
                 this.canFetchMobileCode = false;
-                this.getCodeMsg = '该手机号码已经注册';
-                callback(new Error('该手机号码已经注册'));
+                this.getCodeMsg = "该手机号码已经注册";
+                callback(new Error("该手机号码已经注册"));
               }
             })
             .catch(() => {
-              callback(new Error('远端验证失败'));
+              callback(new Error("远端验证失败"));
             });
         }
       } else {
-        callback(new Error('请输入正确手机号码'));
+        callback(new Error("请输入正确手机号码"));
       }
     };
     const passwordValidate = (rule, value, callback) => {
-      const reg = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*]+$)(?![a-zA-z\d]+$)(?![a-zA-z!@#$%^&*]+$)(?![\d!@#$%^&*]+$)[a-zA-Z\d!@#$%^&*]+$/;
-      const reg1 = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*]+$)[a-zA-Z\d!@#$%^&*]+$/;
-      let msg = "ok";
-      if (reg.test(value)) {
-        msg = "强：👍👍👍";
-      } else if (reg1.test(value)) {
-        msg = "中：👌👌";
-      } else {
-        msg = "弱：👌";
+      if (value.length <= 6) {
+        return callback(new Error("密码必须多于6位字符"));
       }
+      // const reg = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*]+$)(?![a-zA-z\d]+$)(?![a-zA-z!@#$%^&*]+$)(?![\d!@#$%^&*]+$)[a-zA-Z\d!@#$%^&*]+$/;
+      // const reg1 = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*]+$)[a-zA-Z\d!@#$%^&*]+$/;
+      // let msg = "ok";
+      // if (reg.test(value)) {
+      //   msg = "强：👍👍👍";
+      // } else if (reg1.test(value)) {
+      //   msg = "中：👌👌";
+      // } else {
+      //   msg = "弱：👌";
+      // }
       if (value) {
-        callback(msg);
+        callback();
       } else {
         callback(new Error("密码不能为空"));
       }
@@ -101,21 +100,34 @@ export default {
         callback(new Error("密码不能为空"));
       }
     };
+    const mobileCodeValidate = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("验证码不能为空"));
+      } else {
+        let reg = /^\d{6}$/;
+        if (!reg.test(value)) {
+          callback(new Error("必须为6位数字"));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       canFetchMobileCode: false,
-      getCodeMsg:'请输入手机号码',
+      getCodeMsg: "请输入手机号码",
       time: 60,
+      hasGetCode: false, //是否已经发送过验证码
       formData: {
         mobileNum: "",
         pass: "",
         enPass: "",
-        rememberMe: false,
         mobileCode: ""
       },
       rules: {
         mobileNum: [{ validator: mobileNumValidate, trigger: "blur" }],
         pass: [{ validator: passwordValidate, trigger: "blur" }],
-        enPass: [{ validator: enPasswordValidate, trigger: "blur" }]
+        enPass: [{ validator: enPasswordValidate, trigger: "blur" }],
+        mobileCode: [{ validator: mobileCodeValidate, trigger: "blur" }]
       }
     };
   },
@@ -123,7 +135,9 @@ export default {
     fetchMobileCode() {
       const that = this;
       if (this.canFetchMobileCode) {
-        this.canFetchMobileCode = false;
+        //如果发送过验证码，允许提交表单
+        that.hasGetCode = true;
+        that.canFetchMobileCode = false;
         that.time = 60;
         const timerIndex = setInterval(() => {
           that.time -= 1;
@@ -135,34 +149,57 @@ export default {
           }
         }, 1000);
         // TODO
-        this.$http({
-          url: `/api/mobilecode?mobileNum=${this.formData.mobileNum}`,
-          method: "get"
-        }).then(({ data }) => {
-          if (!data.success) {
-            this.$notify({
-              title: "",
-              message: "发送成功",
-              duration: 2000
-            });
-          } else {
-            this.$notify({
-              title: "",
-              message: "发送失败",
-              duration: 2000
-            });
-          }
-        });
+        that
+          .$http({
+            url: `/api/mobilecode?mobileNum=${that.formData.mobileNum}`,
+            method: "get"
+          })
+          .then(({ data }) => {
+            if (data.success) {
+              that.$notify({
+                title: "",
+                message: "发送成功",
+                duration: 2000
+              });
+            } else {
+              that.$notify({
+                title: "",
+                message: "发送失败",
+                duration: 2000
+              });
+            }
+          });
         console.log("fetching mobile code");
       }
     },
     submitForm() {
+      if (!this.hasGetCode) {
+        this.$notify({
+          message: "请先获取验证码",
+          duration: 2000
+        });
+        return;
+      }
       this.$refs.form.validate(isOk => {
         if (isOk) {
-          const account = this.formData.mobileNum;
-          const password = this.formData.pass;
-          const { rememberMe } = this.formData;
-          this.$emit("getSonData", { account, password, rememberMe });
+          const { pass } = this.formData;
+          this.$http({
+            url: "/api/register",
+            method: "POST",
+            data: {
+              ...this.formData,
+              password: this.$md5(pass) //加密
+            }
+          }).then(({ data }) => {
+            if (data.success) {
+              this.$router.push({ path: data.location }); //跳转到登录页
+            } else {
+              this.$notify({
+                message: data.msg,
+                duration: 2000
+              });
+            }
+          });
         }
       });
     },

@@ -1,20 +1,17 @@
-import Login from 'components/submit_form/Login.vue';
-import Regster from 'components/register/Register.vue';
 import Main from 'components/main/Main.vue';
+import LoginRegister from 'components/submit_form/Index.vue';
 
 export default {
   routes: [
     {
-      path: '/',
+      path: '/product',
       component: Main,
+      name: 'allProduction',
     },
     {
-      path: '/login',
-      component: Login,
-    },
-    {
-      path: '/reg',
-      component: Regster,
+      path: '/login-register',
+      component: LoginRegister,
+      name: 'loginRegister',
     },
   ],
 };

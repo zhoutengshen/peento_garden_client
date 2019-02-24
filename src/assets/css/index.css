@@ -1,6 +1,10 @@
 html{
     font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
     font-size: 14px;
-    color: #606266;
+    background-color: #f6f6f6;
     line-height: 1.5em;
+    height: 100%;
+}
+body{
+    height: 100%;
 }

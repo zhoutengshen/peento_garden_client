@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form fr">
+  <div>
     <PhoneCodeForm
       :check-mobile-num="checkMobileNum"
       @getSonData="submitForm"
@@ -34,10 +34,6 @@
   </div>
 </template>
 <style scoped>
-.login-form {
-  width: 400px;
-  margin: 10px;
-}
 .el-col {
   text-align: center;
   cursor: pointer;
