@@ -1,18 +1,19 @@
 <template>
   <el-row>
     <el-col :span="24">
-      <FruitItem></FruitItem>
+      <FruitList>
+      </FruitList>
     </el-col>
   </el-row>
 </template>
 <style scoped>
 </style>
 <script>
-import FruitItem from 'components/product/Item';
+import FruitList from 'components/product/List.vue';
 
 export default {
   components:{
-    FruitItem,
+    FruitList,
   }
 };
 </script>

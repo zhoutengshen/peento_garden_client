@@ -1,16 +1,22 @@
 <template>
-  <el-row type="flex" class="content">
-    <el-col :offset="4" :span="16">
+  <div class="content">
+    <div class="main clearfix">
       <slot></slot>
-    </el-col>
-  </el-row>
+    </div>
+  </div>
 </template>
 <style scoped>
-.content{
-    margin:15px;
-    background-color: #fff;
-    border-radius: 10px;
-    height: 100%;
+.content {
+  margin: 15px;
+  margin-top: 65px;
+  border-radius: 10px;
+   min-height: 100%;
+}
+.main {
+  margin: 0 auto;
+  width: 1300px;
+  background-color: #fff;
+   min-height: 100%;
 }
 </style>
 <script>

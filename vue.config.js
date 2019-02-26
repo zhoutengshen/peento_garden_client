@@ -13,7 +13,8 @@ module.exports = {
       .set('layout', resolve('src/layout'))
       .set('base', resolve('src/base'))
       .set('static', resolve('src/static'))
-      .set('router', resolve('/src/router'));
+      .set('router', resolve('/src/router'))
+      .set('mock', resolve('src/mock'));
   },
   devServer: {
     proxy: {
