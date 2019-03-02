@@ -1,15 +1,15 @@
 <template>
-  <Home/>
+  <ViewMain/>
 </template>
 <style>
 </style>
 <script>
-import Home from './views/home/Home.vue';
+import ViewMain from './views/Index.vue';
 
 export default {
   name: 'app',
   components: {
-    Home,
+    ViewMain,
   },
 };
 </script>

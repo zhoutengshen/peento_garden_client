@@ -115,17 +115,17 @@ export default {
         this.$http({
           url: `/api/mobilecode?mobileNum=${this.formData.mobileNum}`,
           method: 'get',
-        }).then(({ result }) => {
+        }).then(({ data }) => {
+          const result = { ...data };
+          console.log(result);
           if (result.success) {
             this.$notify({
-              title: '',
               message: '发送成功',
               duration: 800,
             });
           } else {
             this.$notify({
-              title: '',
-              message: '失败',
+              message: '发送失败',
               duration: 800,
             });
           }

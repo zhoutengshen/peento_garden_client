@@ -18,32 +18,38 @@
 </style>
 
 <script>
-import LoginForm from "./login/Login.vue";
-import RegisterForm from "./register/Register.vue";
+import LoginForm from 'components/forms/login/Login.vue';
+import RegisterForm from 'components/forms/register/Register.vue';
 
 export default {
   data() {
     return {
-      activeName: "login"
+      activeName: 'login',
     };
   },
   components: {
     LoginForm,
-    RegisterForm
+    RegisterForm,
   },
   methods: {
     handleClick({ index }) {
       this.$router.push({
-        name: "loginRegister",
+        name: 'loginRegister',
         query: {
-          ft: index
-        }
+          ft: index,
+        },
       });
-    }
+    },
   },
   mounted() {
-    let type = this.$route.query.ft;
-    this.activeName = type == 0 ? "login" : "register";
-  }
+    const type = this.$route.query.ft;
+    this.activeName = type == 0 ? 'login' : 'register';
+  },
+  watch: {
+    $route(to) {
+      const type = to.query.ft;
+      this.activeName = type == 0 ? 'login' : 'register';
+    },
+  },
 };
 </script>

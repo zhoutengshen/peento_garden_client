@@ -1,23 +1,23 @@
 <template>
   <el-card shadow="hover" :body-style="{ padding: '0px' }" class="card">
     <div class="img-container">
-      <img :src="fruit.fruit_img_url">
+      <img :src="fruit.fruitImgUrl">
     </div>
     <div class="footer">
-      <el-tooltip class="tool-tip" effect="dark" :content="fruit.fruit_title" placement="top">
-        <em class="title">{{fruit.fruit_title}}</em>
+      <el-tooltip class="tool-tip" effect="dark" :content="fruit.fruitTitle" placement="top">
+        <em class="title">{{fruit.fruitTitle}}</em>
       </el-tooltip>
       <span class="summary">{{summary}}</span>
       <div class="price">
         <em>￥{{fruit.price}}</em>
-        <span class="original-price">{{originalPrice}}</span>
+        <span class="original-price">{{this.fruit.originalPrice}}</span>
       </div>
       <div class="clearfix">
         <span class="buyer-count fl">
           已有
-          <i>{{fruit.buyer_count}}</i>人购买
+          <i>{{fruit.buyerCount}}</i>人购买
         </span>
-        <span class="shop-card fr">
+        <span @click="addCartItem" class="shop-card fr">
           <i class="iconfont icon-cart"></i>加入购物车
         </span>
       </div>
@@ -72,7 +72,7 @@
   color: #909399;
   text-decoration: line-through;
 }
-.price{
+.price {
   margin-top: 10px;
 }
 .price em {
@@ -95,30 +95,41 @@
   background-color: red;
 }
 .shop-card i {
-  margin: 0 5px;;
+  margin: 0 5px;
+}
+.ball {
+  position: fixed;
+  display: block;
+  width: 10px;
+  height: 10px;
 }
 </style>
 
 <script>
+import { ADD_CART_ITEM_MUTATION } from "store/mutationType";
+
 export default {
-  props:{
-    fruit:{
-      type:Object,
-      required:true,
+  props: {
+    fruit: {
+      type: Object,
+      required: true
     }
   },
   data() {
-    return {
-    };
+    return {};
   },
 
   computed: {
     summary() {
-      return "简介：" + (this.fruit.summary ? this.fruit.summary : "无");
-    },
-    originalPrice() {
-      let originalPrice = (this.fruit.price / this.fruit.discount) * 10;
-      return "￥" + originalPrice.toFixed(2);
+      return `简介：${this.fruit.summary ? this.fruit.summary : "无"}`;
+    }
+  },
+  methods: {
+    addCartItem() {
+      const fruit = {
+        ...this.fruit
+      };
+      this.$store.commit(ADD_CART_ITEM_MUTATION, fruit.id);
     }
   }
 };

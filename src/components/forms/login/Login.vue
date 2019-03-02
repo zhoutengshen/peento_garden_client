@@ -53,6 +53,7 @@
 }
 </style>
 <script>
+import { LOGIN_ACTION } from 'store/actionType';
 import PhoneCodeForm from './PhoneCodeForm.vue';
 import EmailForm from './EmailForm.vue';
 import PhoneNumForm from './PhoneNumForm.vue';
@@ -79,6 +80,7 @@ export default {
     changeAccountType(accountType) {
       this.accountType = accountType;
     },
+
     submitForm(obj) {
       let { password } = obj;
       // 密码登录  加密密码
@@ -86,19 +88,25 @@ export default {
         console.log('加密密码....');
         password = this.$md5(password);
       }
-      this.$http({
-        url: '/api/login',
-        method: 'POST',
-        data: {
-          ...obj,
-          password,
-          accountType: this.accountType,
-        },
-      })
-        .then((resp) => {
-          console.log(resp);
+      const data = {
+        ...obj,
+        password,
+        accountType: this.accountType,
+      };
+      // TODO
+      this.$store
+        .dispatch(LOGIN_ACTION, data)
+        .then(() => {
+          this.$router.push({
+            name: 'allProduction',
+          });
         })
-        .catch(() => {});
+        .catch(() => {
+          this.$notify({
+            message: '登录失败',
+            dulation: 2000,
+          });
+        });
     },
     checkMobileNum({ account }) {
       return this.check(this.accountType, account, '/api/check/account');

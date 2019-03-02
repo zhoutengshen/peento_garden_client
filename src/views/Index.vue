@@ -2,9 +2,7 @@
   <div class="home">
     <Header></Header>
     <Content>
-      <transition name="fade">
-        <router-view></router-view>
-      </transition>
+      <router-view></router-view>
     </Content>
     <Footer></Footer>
     <FloatBasket></FloatBasket>
@@ -14,9 +12,9 @@
 @import url("./style.css");
 </style>
 <script>
-import Header from 'components/layout/header/Header.vue';
-import Content from 'components/layout/content/Content.vue';
-import Footer from 'components/layout/footer/Footer.vue';
+import Header from 'views/layout/header/Header.vue';
+import Content from 'views/layout/content/Content.vue';
+import Footer from 'views/layout/footer/Footer.vue';
 import FloatBasket from 'components/float_basket/FloatBasket.vue';
 
 export default {
@@ -26,7 +24,6 @@ export default {
     Footer,
     FloatBasket,
   },
-  watch: {
-  },
+  watch: {},
 };
 </script>

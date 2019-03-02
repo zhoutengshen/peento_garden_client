@@ -14,7 +14,9 @@ module.exports = {
       .set('base', resolve('src/base'))
       .set('static', resolve('src/static'))
       .set('router', resolve('/src/router'))
-      .set('mock', resolve('src/mock'));
+      .set('mock', resolve('src/mock'))
+      .set('store', resolve('src/store'))
+      .set('views',resolve('src/views'));
   },
   devServer: {
     proxy: {

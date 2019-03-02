@@ -1,10 +1,35 @@
 <template>
-  <div @mousedown="move" class="main" :style="{top:positionY + 'px',left:positionX + 'px'}">
-    <i class="cart-size iconfont icon-float-basket">
-      <span class="badge">
-        <i>12</i>
-      </span>
+  <div class="main" :style="{top:positionY + 'px',left:positionX + 'px'}">
+    <span
+      @click="navToMyCart"
+      title="去购物车页"
+      class="badge"
+      style="left:37px;background:#000;opacity:.5;z-index:1000;top:-20px"
+    >查</span>
+    <i @mousedown="move()" class="cart-size iconfont icon-float-basket">
+      <span
+        @mouseleave="showDiscFruits=false"
+        @mouseenter="showDiscFruits=true"
+        class="badge"
+      >{{count}}</span>
     </i>
+    <ul
+      @mouseleave="showDiscFruits=false"
+      @mouseenter="showDiscFruits=true"
+      :class="['disc-fruit',showDiscFruits&&count&&'disc-fruit-show'] "
+    >
+      <li @click="navToProdDetail"  v-for="({id,count},fruitTitle) of fruitSummarys" :key="fruitTitle">
+        <span class="count">{{count}}</span>
+        <span
+          class="title"
+          :title="fruitTitle"
+        >{{fruitTitle}}</span>
+        <span class="reduce-increase">
+          <i @click="reduce(id)" class="iconfont icon-down"></i>
+          <i @click="increase(id)" class="iconfont icon-up"></i>
+        </span>
+      </li>
+    </ul>
   </div>
 </template>
 <style scoped>
@@ -26,56 +51,168 @@
 .badge {
   display: inline-block;
   position: absolute;
-  top: -15px;
-  right: -15px;
+  top: 0px;
+  right: -10px;
   width: 30px;
   height: 30px;
+  text-align: center;
   border-radius: 15px;
   background: #e6a23c;
-}
-.badge i {
-  position: absolute;
-  font-weight: 800;
   font-size: 16px;
-  top: 6px;
-  left: 4px;
+  line-height: 30px;
+  color: #fff;
+  cursor: pointer;
+}
+.badge1 {
+  position: absolute;
+  font-size: 20px;
+  top: 0;
+  text-align: center;
+  border-radius: 15px;
+  line-height: 30px;
+  width: 30px;
+  background: #ffff;
+  height: 30px;
+  display: inline-block;
+  left: 39px;
+}
+.disc-fruit:hover {
+  cursor: pointer;
+}
+.disc-fruit-show {
+  display: inline-block;
+}
+.disc-item .count {
   color: #fff;
 }
-.show-cart-list {
+.disc-item .title {
+  color: #fff;
+}
+ul {
+  display: none;
   position: absolute;
-  right: 15px;
-  border: 30px solid transparent;
-  border-top: 5px solid #dcdfe6;
-  cursor: pointer;
+  box-sizing: border-box;
+  padding: 10px;
+  top: -15px;
+  left: 100px;
+  width: 300px;
+  border-radius: 5px;
+  background: #000;
+  z-index: -1;
+  opacity: 0.5;
+}
+ul > li {
+  line-height: 20px;
+  color: #fff;
+  margin: 5px;
+  user-select: none;
+}
+ul > li .count {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+  background: red;
+  border-radius: 50%;
+}
+ul > li .title {
+  display: inline-block;
+  width: 200px;
+  margin-left: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+}
+ul > li .title:hover {
+  color: #409eff;
+}
+ul > li .reduce-increase {
+  display: inline-block;
+  width: 40px;
+  font-size: 20px;
+  color: #67c23a;
+}
+ul > li i:hover {
+  color: red;
 }
 </style>
 <script>
+import {
+  ADD_CART_ITEM_MUTATION,
+  DEL_CART_ITEM_MUTATION
+} from "store/mutationType";
+import lodash from "lodash";
+
 export default {
   data() {
     return {
-      positionX: 20,
-      positionY: 50
+      showDiscFruits: false
     };
   },
   methods: {
-    move(e) {
-      let odiv = e.target; //获取目标元素
-
-      let lastX = 0;
-      let lastY = 0;
-
+    navToProdDetail(){
+      this.$router.push({
+        name:"/prodDetail"
+      });
+      this.showDiscFruits = false;
+    },
+    navToMyCart() {
+      this.$router.push({
+        name:"myCart"
+      })
+    },
+    increase(id) {
+      this.$store.commit(ADD_CART_ITEM_MUTATION, id);
+    },
+    reduce(id) {
+      this.$store.commit(DEL_CART_ITEM_MUTATION, id);
+    },
+    move() {
       document.onmousemove = e => {
-        //鼠标按下并移动的事件
-
-        this.positionY = e.clientY-30;
-        this.positionX = e.clientX -30;
+        // 鼠标按下并移动的事件
+        this.$store.state.floatBasketPosition = {
+          x: e.clientX - 30,
+          y: e.clientY - 30
+        };
+        //
       };
-      document.onmouseup = e => {
+      document.onmouseup = () => {
         document.onmousemove = null;
         document.onmouseup = null;
+        if (!!sessionStorage) {
+          sessionStorage.setItem(
+            //保存数据
+            "floatBasketPosition",
+            JSON.stringify(this.$store.state.floatBasketPosition)
+          );
+        }
       };
+    }
+  },
+  computed: {
+    count() {
+      return this.$store.getters.cartItemsLength;
+    },
+    fruitSummarys() {
+      const result = {};
+      this.$store.state.cartItems.forEach(item => {
+        if (result[item.fruitTitle]) {
+          result[item.fruitTitle].count += 1;
+          result[item.fruitTitle].id = item.id;
+        } else {
+          result[item.fruitTitle] = {};
+          result[item.fruitTitle].count = 1;
+          result[item.fruitTitle].id = item.id;
+        }
+      });
+      return result;
+    },
+    positionX() {
+      return this.$store.state.floatBasketPosition.x;
+    },
+    positionY() {
+      return this.$store.state.floatBasketPosition.y;
     }
   }
 };
 </script>
-
