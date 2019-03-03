@@ -53,16 +53,16 @@
 }
 </style>
 <script>
-import { LOGIN_ACTION } from 'store/actionType';
-import PhoneCodeForm from './PhoneCodeForm.vue';
-import EmailForm from './EmailForm.vue';
-import PhoneNumForm from './PhoneNumForm.vue';
+import { LOGIN_ACTION } from "store/actionType";
+import PhoneCodeForm from "./PhoneCodeForm.vue";
+import EmailForm from "./EmailForm.vue";
+import PhoneNumForm from "./PhoneNumForm.vue";
 
 export default {
   components: {
     PhoneCodeForm,
     PhoneNumForm,
-    EmailForm,
+    EmailForm
   },
   data() {
     return {
@@ -72,8 +72,8 @@ export default {
         email: 1,
         mobileNum: 2,
         account: 3,
-        mobileCode: 4,
-      },
+        mobileCode: 4
+      }
     };
   },
   methods: {
@@ -85,48 +85,55 @@ export default {
       let { password } = obj;
       // 密码登录  加密密码
       if (this.accountType != this.ACCNOUNT_TYPE.mobileCode) {
-        console.log('加密密码....');
+        console.log("加密密码....");
         password = this.$md5(password);
       }
       const data = {
         ...obj,
         password,
-        accountType: this.accountType,
+        accountType: this.accountType
       };
       // TODO
       this.$store
         .dispatch(LOGIN_ACTION, data)
-        .then(() => {
-          this.$router.push({
-            name: 'allProduction',
-          });
+        .then(({ success, msg }) => {
+          if (success) {
+            this.$router.push({
+              name: "allProduction"
+            });
+          } else {
+            this.$notify({
+              message: msg,
+              dulation: 2000
+            });
+          }
         })
         .catch(() => {
           this.$notify({
-            message: '登录失败',
-            dulation: 2000,
+            message: "登录失败",
+            dulation: 2000
           });
         });
     },
     checkMobileNum({ account }) {
-      return this.check(this.accountType, account, '/api/check/account');
+      return this.check(this.accountType, account, "/api/check/account");
     },
     checkEmail({ account }) {
-      return this.check(this.accountType, account, '/api/check/account');
+      return this.check(this.accountType, account, "/api/check/account");
     },
     check(accountType, account, reqUrl) {
       return new Promise((resolve, reject) => {
         this.$http({
-          method: 'GET',
-          url: `${reqUrl}?account=${account}&accountType=${accountType}`,
+          method: "GET",
+          url: `${reqUrl}?account=${account}&accountType=${accountType}`
         })
-          .then((resp) => {
+          .then(resp => {
             resolve(resp.data);
           })
           .catch(reject);
       });
-    },
+    }
   },
-  created() {},
+  created() {}
 };
 </script>

@@ -7,14 +7,14 @@
       <router-link exact class="fl" :to="{name:'allProduction'}">尝鲜装</router-link>
       <div class="fr">
         <el-dropdown>
-          <Avatar :src="avatarUrl" style="height:30px;width:30px"></Avatar>
-          <el-dropdown-menu v-if="!!user" slot="dropdown">
+          <Avatar :src="user.avatarUrl" style="height:30px;width:30px"></Avatar>
+          <el-dropdown-menu v-if="hasLogin" slot="dropdown">
             <el-dropdown-item @click.native="logoutHandle">退出登录</el-dropdown-item>
             <el-dropdown-item @click.native.stop="navToPersonal">个人中心</el-dropdown-item>
             <el-dropdown-item @click.native.stop="navToMycart">我的购物车</el-dropdown-item>
             <el-dropdown-item @click.native.stop="navToOrder">订单信息</el-dropdown-item>
           </el-dropdown-menu>
-          <el-dropdown-menu v-if="!user" slot="dropdown">
+          <el-dropdown-menu v-if="!hasLogin" slot="dropdown">
             <router-link :to="{name:'loginRegister',query:{ft:0}}">
               <el-dropdown-item>登录</el-dropdown-item>
             </router-link>
@@ -134,13 +134,18 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.getters.user;
+      let avatarUrl = require("assets/img/defaultAvatar.png");
+      let user = this.$store.getters.user;
+      if (!user.avatarUrl) {
+        user = {
+          ...user,
+          avatarUrl
+        };
+      }
+      return user;
     },
-    avatarUrl() {
-      const defaultAvatarUrl = require("assets/img/defaultAvatar.png");
-      return this.$store.getters.user
-        ? this.$store.getters.user.avatarUrl
-        : defaultAvatarUrl;
+    hasLogin() {
+      return this.$store.state.hasLogin;
     }
   }
 };

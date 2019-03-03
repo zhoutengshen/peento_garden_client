@@ -21,7 +21,7 @@ import FruitItem from "./Item.vue";
 
 export default {
   components: {
-    FruitItem
+    FruitItem,
   },
   data() {
     return {};
@@ -30,13 +30,13 @@ export default {
   mounted() {
     this.$store.dispatch(FETCH_ALL_PRODUCTIONS_ACTION, {
       limit: 100,
-      offset: 0
+      offset: 0,
     });
   },
   computed: {
     allFruits() {
       return this.$store.state.allFruits;
-    }
-  }
+    },
+  },
 };
 </script>

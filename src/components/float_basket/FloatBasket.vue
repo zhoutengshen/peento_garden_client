@@ -139,27 +139,27 @@ ul > li i:hover {
 <script>
 import {
   ADD_CART_ITEM_MUTATION,
-  DEL_CART_ITEM_MUTATION
+  DEL_CART_ITEM_MUTATION,
 } from "store/mutationType";
 import lodash from "lodash";
 
 export default {
   data() {
     return {
-      showDiscFruits: false
+      showDiscFruits: false,
     };
   },
   methods: {
-    navToProdDetail(){
+    navToProdDetail() {
       this.$router.push({
-        name:"/prodDetail"
+        name: "/prodDetail",
       });
       this.showDiscFruits = false;
     },
     navToMyCart() {
       this.$router.push({
-        name:"myCart"
-      })
+        name: "myCart",
+      });
     },
     increase(id) {
       this.$store.commit(ADD_CART_ITEM_MUTATION, id);
@@ -168,26 +168,26 @@ export default {
       this.$store.commit(DEL_CART_ITEM_MUTATION, id);
     },
     move() {
-      document.onmousemove = e => {
+      document.onmousemove = (e) => {
         // 鼠标按下并移动的事件
         this.$store.state.floatBasketPosition = {
           x: e.clientX - 30,
-          y: e.clientY - 30
+          y: e.clientY - 30,
         };
         //
       };
       document.onmouseup = () => {
         document.onmousemove = null;
         document.onmouseup = null;
-        if (!!sessionStorage) {
+        if (sessionStorage) {
           sessionStorage.setItem(
-            //保存数据
+            // 保存数据
             "floatBasketPosition",
-            JSON.stringify(this.$store.state.floatBasketPosition)
+            JSON.stringify(this.$store.state.floatBasketPosition),
           );
         }
       };
-    }
+    },
   },
   computed: {
     count() {
@@ -195,7 +195,7 @@ export default {
     },
     fruitSummarys() {
       const result = {};
-      this.$store.state.cartItems.forEach(item => {
+      this.$store.state.cartItems.forEach((item) => {
         if (result[item.fruitTitle]) {
           result[item.fruitTitle].count += 1;
           result[item.fruitTitle].id = item.id;
@@ -212,7 +212,7 @@ export default {
     },
     positionY() {
       return this.$store.state.floatBasketPosition.y;
-    }
-  }
+    },
+  },
 };
 </script>

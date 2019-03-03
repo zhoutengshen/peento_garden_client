@@ -27,11 +27,11 @@ export default {
   data() {
     const mobileNumValidate = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('手机号不能为空'));
+        return callback(new Error("手机号不能为空"));
       }
       const reg = /^1[34578]\d{9}$/;
       if (reg.test(value)) {
-        if (typeof this.checkMobileNum === 'function') {
+        if (typeof this.checkMobileNum === "function") {
           this.checkMobileNum({ account: value })
             .then((result) => {
               if (result.success) {
@@ -42,18 +42,18 @@ export default {
               }
             })
             .catch(() => {
-              callback(new Error('远端验证失败'));
+              callback(new Error("远端验证失败"));
             });
         }
       } else {
-        callback(new Error('请输入正确手机号码'));
+        callback(new Error("请输入正确手机号码"));
       }
     };
     const passwordValidate = (rule, value, callback) => {
       if (value) {
         callback();
       } else {
-        callback(new Error('密码不能为空'));
+        callback(new Error("密码不能为空"));
       }
     };
     return {
@@ -61,13 +61,13 @@ export default {
       canFetchMobileCode: true,
       time: 60,
       formData: {
-        mobileNum: '',
-        pass: '',
+        mobileNum: "",
+        pass: "",
         rememberMe: false,
       },
       rules: {
-        mobileNum: [{ validator: mobileNumValidate, trigger: 'blur' }],
-        pass: [{ validator: passwordValidate, trigger: 'blur' }],
+        mobileNum: [{ validator: mobileNumValidate, trigger: "blur" }],
+        pass: [{ validator: passwordValidate, trigger: "blur" }],
       },
     };
   },
@@ -78,7 +78,7 @@ export default {
           const account = this.formData.mobileNum;
           const password = this.formData.pass;
           const { rememberMe } = this.formData;
-          this.$emit('getSonData', { account, password, rememberMe });
+          this.$emit("getSonData", { account, password, rememberMe });
         }
       });
     },

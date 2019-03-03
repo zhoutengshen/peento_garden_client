@@ -112,8 +112,8 @@ export default {
   props: {
     fruit: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {};
@@ -122,15 +122,15 @@ export default {
   computed: {
     summary() {
       return `简介：${this.fruit.summary ? this.fruit.summary : "无"}`;
-    }
+    },
   },
   methods: {
     addCartItem() {
       const fruit = {
-        ...this.fruit
+        ...this.fruit,
       };
       this.$store.commit(ADD_CART_ITEM_MUTATION, fruit.id);
-    }
-  }
+    },
+  },
 };
 </script>

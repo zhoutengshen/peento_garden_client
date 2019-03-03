@@ -63,20 +63,18 @@
 #info input {
   border: 0;
   border-bottom: 2px solid #eee;
+  background: transparent;
 }
 </style>
 <script>
 export default {
-  props: {
-    disabled: true
-  },
   data() {
     return {
-      canFetchCode: false,//是否可以从新获取验证码
-      hasSendCode: false,//已经发送了验证码
+      canFetchCode: false, // 是否可以从新获取验证码
+      hasSendCode: false, // 已经发送了验证码
       timerMsg: "获取验证码",
-      timer: 60,//60秒后可以从新发送验证码
-      hasSendEmailCheck: false,//是否发送了邮箱校验
+      timer: 60, // 60秒后可以从新发送验证码
+      hasSendEmailCheck: false, // 是否发送了邮箱校验
       emailCheckMsg: "发送邮件校验",
       formData: {
         username: "牛逼",
@@ -84,7 +82,8 @@ export default {
         gender: "保密",
         mobile: "13169141973",
         email: "1724847624@qq.com",
-        realname: "zhoutengshen"
+        realname: "zhoutengshen",
+        avatarUrl: ""
       },
       oddFormData: {
         username: "牛逼",
@@ -120,10 +119,9 @@ export default {
               callback("手机号码不能为空");
               return;
             }
-            let reg = /^1[34578]\d{9}$/;
+            const reg = /^1[34578]\d{9}$/;
             if (!reg.test(value)) {
               callback("手机号码格式错误");
-              return;
             } else {
               if (this.formData.mobile == this.oddFormData.mobile) {
                 callback();
@@ -131,7 +129,7 @@ export default {
               }
               this.checkMobileNum(2).then(data => {
                 if (!data.success) {
-                  //这个手机没有绑定其他账号
+                  // 这个手机没有绑定其他账号
                   if (!this.hasSendCode) {
                     callback("修改手机号码请获取验证码");
                   } else {
@@ -139,7 +137,7 @@ export default {
                   }
                   this.canFetchCode = true;
                 } else {
-                  //该手机已经绑定了其他账号
+                  // 该手机已经绑定了其他账号
                   callback("该手机已经绑定了其他账号");
                 }
               });
@@ -159,30 +157,29 @@ export default {
               callback();
               return;
             }
-            let reg = new RegExp(
+            const reg = new RegExp(
               "^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"
             );
             if (!reg.test(value)) {
               callback("邮箱格式错误");
               return;
-            } else {
-              if (this.has) {
-                return;
-              }
-              this.checkMobileNum(1).then(data => {
-                if (!data.success) {
-                  //这个邮箱没有绑定其他账号
-                  if (!this.sendEmailCheck) {
-                    callback("修改邮箱前校验邮箱");
-                  } else {
-                    callback();
-                  }
-                } else {
-                  //该手机已经绑定了其他账号
-                  callback("该邮箱已经绑定了其他账号");
-                }
-              });
             }
+            if (this.has) {
+              return;
+            }
+            this.checkMobileNum(1).then(data => {
+              if (!data.success) {
+                // 这个邮箱没有绑定其他账号
+                if (!this.sendEmailCheck) {
+                  callback("修改邮箱前校验邮箱");
+                } else {
+                  callback();
+                }
+              } else {
+                // 该手机已经绑定了其他账号
+                callback("该邮箱已经绑定了其他账号");
+              }
+            });
           }
         },
         realname: {
@@ -201,16 +198,16 @@ export default {
       this.hasSendEmailCheck = true;
       this.$refs.formData.validateField("email");
       this.emailCheckMsg = "已发送邮件，请点击邮件链接确认";
-      //发送校验
+      // 发送校验
     },
     sendCode() {
-      let that = this;
+      const that = this;
       if (!that.hasSendCode) {
-        that.timerMsg = that.timer + "后获取验证码";
+        that.timerMsg = `${that.timer}后获取验证码`;
         that.hasSendCode = true;
         that.$refs.formData.validateField("mobile");
-        let timerIndex = setInterval(() => {
-          that.timerMsg = that.timer + "后获取验证码";
+        const timerIndex = setInterval(() => {
+          that.timerMsg = `${that.timer}后获取验证码`;
           if (that.timer <= 0) {
             that.hasSendCode = false;
             that.timer = 60;
@@ -219,7 +216,7 @@ export default {
           }
           that.timer -= 1;
         }, 1000);
-        //发送验证码；
+        // 发送验证码；
       }
     },
     checkMobileNum(accountType) {

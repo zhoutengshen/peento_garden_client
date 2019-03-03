@@ -2,23 +2,23 @@ import Router from "vue-router";
 import Vue from "vue";
 import { beforeEach } from "./auth.js";
 
-const FruitsList = () => import('views/product/List.vue');
-const LoginRegister = () => import('views/login_register/LoginRegister.vue');
+const FruitsList = () => import("views/product/List.vue");
+const LoginRegister = () => import("views/login_register/LoginRegister.vue");
 const Personal = () => import("views/personal/Personal.vue");
 const MyCart = () => import("views/my_cart/MyCart.vue");
 const Order = () => import("views/order/Order.vue");
-const ProductionDetail = () => import("views/product_detail/ProductionDetail.vue")
+const ProductionDetail = () => import("views/product_detail/ProductionDetail.vue");
 const routerCfg = {
   routes: [
     {
-      path: '/product',
+      path: "/product",
       component: FruitsList,
-      name: 'allProduction',
+      name: "allProduction",
     },
     {
-      path: '/login-register',
+      path: "/login-register",
       component: LoginRegister,
-      name: 'loginRegister',
+      name: "loginRegister",
     },
     {
       path: "/personal",
@@ -26,7 +26,7 @@ const routerCfg = {
       name: "personal",
       meta: {
         requiresAuth: true,
-      }
+      },
     },
     {
       path: "/my-cart",
@@ -34,19 +34,19 @@ const routerCfg = {
       component: MyCart,
       meta: {
         requiresAuth: true,
-      }
+      },
     }, {
       path: "/order",
       name: "order",
       component: Order,
       meta: {
         requiresAuth: true,
-      }
+      },
     }, {
-      path: '/production-detail',
+      path: "/production-detail",
       name: "prodDetail",
-      component: ProductionDetail
-    }
+      component: ProductionDetail,
+    },
   ],
 };
 Vue.use(Router);

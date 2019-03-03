@@ -25,14 +25,14 @@ export default {
   data() {
     const emailValidate = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('邮箱不能为空'));
+        return callback(new Error("邮箱不能为空"));
       }
       const reg = new RegExp(
         /^([a-zA-Z0-9._-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/,
       );
       const result = reg.test(value);
       if (result) {
-        if (typeof this.checkEmail === 'function') {
+        if (typeof this.checkEmail === "function") {
           console.log(value);
           this.checkEmail({ account: value })
             .then((result) => {
@@ -43,16 +43,16 @@ export default {
               }
             })
             .catch(() => {
-              callback(new Error('远端验证失败'));
+              callback(new Error("远端验证失败"));
             });
         }
       } else {
-        callback(new Error('请输入正确邮箱格式'));
+        callback(new Error("请输入正确邮箱格式"));
       }
     };
     const passwordValidate = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('密码不能为空'));
+        return callback(new Error("密码不能为空"));
       }
       callback();
     };
@@ -61,13 +61,13 @@ export default {
       canFetchMobileCode: true,
       time: 60,
       formData: {
-        email: '',
-        pass: '',
+        email: "",
+        pass: "",
         rememberMe: false,
       },
       rules: {
-        email: [{ validator: emailValidate, trigger: 'blur' }],
-        pass: [{ validator: passwordValidate, trigger: 'blur' }],
+        email: [{ validator: emailValidate, trigger: "blur" }],
+        pass: [{ validator: passwordValidate, trigger: "blur" }],
       },
     };
   },
@@ -78,7 +78,7 @@ export default {
           const account = this.formData.email;
           const password = this.formData.pass;
           const { rememberMe } = this.formData;
-          this.$emit('getSonData', { account, password, rememberMe });
+          this.$emit("getSonData", { account, password, rememberMe });
         }
       });
     },

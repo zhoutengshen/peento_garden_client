@@ -4,10 +4,10 @@
 <style>
 </style>
 <script>
-import ViewMain from './views/Index.vue';
+import ViewMain from "./views/Index.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     ViewMain,
   },
