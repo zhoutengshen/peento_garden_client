@@ -9,35 +9,70 @@
     class="info"
   >
     <el-form-item label="用户名" prop="username">
-      <el-input v-model="formData.username" class="hover-underline-animation"></el-input>
+      <label v-if="!enableEdited.username" class="inof-lable">{{formData.username}}</label>
+      <el-input
+        v-if="enableEdited.username"
+        v-model="formData.username"
+        class="hover-underline-animation"
+      ></el-input>
+      <EditedBtn @edited="editedUserName"></EditedBtn>
     </el-form-item>
+
     <el-form-item label="年龄" prop="age">
-      <el-input v-model="formData.age" class="hover-underline-animation"></el-input>
+      <label v-if="!enableEdited.age" class="inof-lable">{{formData.age}}</label>
+      <el-input v-if="enableEdited.age" v-model="formData.age" class="hover-underline-animation"></el-input>
+      <EditedBtn @edited="editedAge"></EditedBtn>
     </el-form-item>
+
     <el-form-item label="性别" prop="gender">
-      <el-select v-model="formData.gender" class="hover-underline-animation">
+      <label v-if="!enableEdited.gender" class="inof-lable">{{formData.gender}}</label>
+      <el-select
+        v-if="enableEdited.gender"
+        v-model="formData.gender"
+        class="hover-underline-animation"
+      >
         <el-option value="-1" label="保密"></el-option>
         <el-option value="1" label="男"></el-option>
         <el-option value="0" label="女"></el-option>
       </el-select>
+      <EditedBtn @edited="editedGender"></EditedBtn>
     </el-form-item>
+
     <el-form-item label="手机号码" prop="mobile">
-      <el-input v-model="formData.mobile" class="hover-underline-animation"></el-input>
+      <label v-if="!enableEdited.mobile" class="inof-lable">{{formData.mobile}}</label>
+      <el-input
+        v-if="enableEdited.mobile"
+        v-model="formData.mobile"
+        class="hover-underline-animation"
+      ></el-input>
       <i v-if="canFetchCode" style="cursor:pointer" @click="sendCode">{{timerMsg}}</i>
+      <EditedBtn @edited="editedMobile"></EditedBtn>
     </el-form-item>
+
     <el-form-item v-if="hasSendCode" label="验证码">
       <el-input placeholder="输入获取到的验证码"></el-input>
     </el-form-item>
+
     <el-form-item label="邮箱" prop="email">
-      <el-input v-model="formData.email" class="hover-underline-animation"></el-input>
+      <label v-if="!enableEdited.email" class="inof-lable">{{formData.email}}</label>
+      <el-input
+        v-if="enableEdited.email"
+        v-model="formData.email"
+        class="hover-underline-animation"
+      ></el-input>
       <i style="cursor:pointer" @click="sendEmailCheck">{{emailCheckMsg}}</i>
+      <EditedBtn @edited="editedEmail"></EditedBtn>
     </el-form-item>
+
     <el-form-item label="真实姓名" prop="realname">
-      <el-input v-model="formData.realname" class="hover-underline-animation"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary">确认</el-button>
-      <el-button>取消</el-button>
+      <label v-if="!enableEdited.realname" class="inof-lable">{{formData.realname}}</label>
+      <el-input
+        v-if="enableEdited.realname"
+        email
+        v-model="formData.realname"
+        class="hover-underline-animation"
+      ></el-input>
+      <EditedBtn @edited="editedRealname"></EditedBtn>
     </el-form-item>
   </el-form>
 </template>
@@ -55,6 +90,11 @@
 .info > div {
   flex: 1;
 }
+.inof-lable {
+  font-size: 40px;
+  font-weight: 600;
+  text-shadow: 2px 4px 6px #666;
+}
 </style>
 <style>
 #info .el-input {
@@ -67,7 +107,13 @@
 }
 </style>
 <script>
+import EditedBtn from "./EditedBtn.vue";
+import { updateUserInfo } from "api/api";
+
 export default {
+  components: {
+    EditedBtn
+  },
   data() {
     return {
       canFetchCode: false, // 是否可以从新获取验证码
@@ -105,10 +151,22 @@ export default {
         age: {
           type: "number",
           required: true,
-          min: 0,
-          max: 120,
-          message: "年龄不能为空，且必须在0 - 100 之间",
-          trigger: "blur"
+          trigger: "blur",
+          validator: (rule, value, callback) => {
+            if (!value) {
+              callback(new Error("输入不能为空"));
+              return;
+            }
+            if (!Number(value)) {
+              callback("必须为数字");
+              return;
+            }
+            if (Number(value) < 0 || Number(value) > 120) {
+              callback("必须大于0小于120");
+              return;
+            }
+            callback();
+          }
         },
         mobile: {
           type: "string",
@@ -190,10 +248,96 @@ export default {
           max: 10,
           type: "string"
         }
+      },
+      enableEdited: {
+        username: false,
+        age: false,
+        gender: false,
+        mobile: false,
+        email: false,
+        realname: false
       }
     };
   },
   methods: {
+    editedUserName(val) {
+      if (val == 0) {
+        this.enableEdited.username = true;
+      } else {
+        this.enableEdited.username = false;
+      }
+      if (val == 1) {
+        //确认
+      } else {
+        //取消
+      }
+    },
+    editedAge(val) {
+      if (val == 0) {
+        this.enableEdited.age = true;
+      } else {
+        this.enableEdited.age = false;
+        if (val == 1) {
+          //确认
+          this.$refs.formData.validateField("email");
+          let values = {};
+          // updateUserInfo({
+          //   id: this.oddFormData.id,
+          //   values
+          // });
+        } else {
+          //取消
+        }
+      }
+    },
+    editedGender(val) {
+      if (val == 0) {
+        this.enableEdited.gender = true;
+      } else {
+        this.enableEdited.gender = false;
+        if (val == 1) {
+          //确认
+        } else {
+          //取消
+        }
+      }
+    },
+    editedEmail(val) {
+      if (val == 0) {
+        this.enableEdited.email = true;
+      } else {
+        this.enableEdited.email = false;
+      }
+      if (val == 1) {
+        //确认
+      } else {
+        //取消
+      }
+    },
+    editedMobile(val) {
+      if (val == 0) {
+        this.enableEdited.mobile = true;
+      } else {
+        this.enableEdited.mobile = false;
+      }
+      if (val == 1) {
+        //确认
+      } else {
+        //取消
+      }
+    },
+    editedRealname(val) {
+      if (val == 0) {
+        this.enableEdited.realname = true;
+      } else {
+        this.enableEdited.realname = false;
+      }
+      if (val == 1) {
+        //确认
+      } else {
+        //取消
+      }
+    },
     sendEmailCheck() {
       this.hasSendEmailCheck = true;
       this.$refs.formData.validateField("email");

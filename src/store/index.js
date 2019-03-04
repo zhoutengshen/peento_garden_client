@@ -32,7 +32,7 @@ const storeCfg = {
   plugins: [createLogger()],
   state: {
     cartItems: [],
-    user: null, // 刷新状态保存,
+    user: {}, // 刷新状态保存,
     hasLogin: false,
     allFruits: [],
     floatBasketPosition: {
@@ -97,7 +97,7 @@ const storeCfg = {
     [SET_USER_MUTATION](state, user) {
       if (user) {
         state.hasLogin = true;
-      } else {
+      } else {//user == null We为注销状态
         user = {};
         state.hasLogin = false;
       }

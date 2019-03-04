@@ -1,7 +1,14 @@
 <template>
   <el-card body-style="padding:0">
     <header class="header" @mouseleave="showCarousel=false">
-      <span @mouseenter="showCarousel=true">更换封面</span>
+      <input
+        accept="image/x-png, image/gif, image/jpeg, image/bmp"
+        type="file"
+        @change="uploadImgHandel('uploadGbImg')"
+        ref="uploadGbImg"
+        class="upload-input"
+      >
+      <span @mouseenter="showCarousel=true" @click="uploadClickHandel('uploadGbImg')">更换封面</span>
       <transition name="fade">
         <el-carousel
           v-if="showCarousel&&!user.bgImgUrl"
@@ -19,15 +26,15 @@
       </div>
     </header>
     <div class="main">
-      <div type="file" class="big-avatar" @click="uploadAvatar">
+      <div type="file" class="big-avatar" @click="uploadClickHandel('uploadAvatar')">
         <img :src="user.avatarUrl">
         <i class="el-icon-upload"></i>
         <input
           accept="image/x-png, image/gif, image/jpeg, image/bmp"
           type="file"
-          @change="uploadAvatarHandle"
+          @change="uploadImgHandel('uploadAvatar')"
           ref="uploadAvatar"
-          class="upload-avatar-input"
+          class="upload-input"
         >
       </div>
       <div class="container">
@@ -42,7 +49,7 @@
 </template>
 <script>
 import EditedForm from "views/personal/EditedForm.vue";
-import { fetchUserInfo } from "api/api";
+import { fetchUserInfo, updateUserInfo, uploadImg } from "api/api";
 import { SET_USER_MUTATION } from "store/mutationType";
 
 export default {
@@ -52,37 +59,54 @@ export default {
   data() {
     return {
       showCarousel: false,
-      tempAvatar: ""
+      userId: "",
+      enSureUpdateAvata: true,
+      bgImgUrl: ""
     };
   },
   methods: {
-    uploadAvatar() {
-      this.$refs["uploadAvatar"].click();
+    uploadClickHandel(inputName) {
+      this.$refs[inputName].click();
     },
-    uploadAvatarHandle() {
-      let input = this.$refs["uploadAvatar"];
+    uploadImgHandel(inputName) {
+      let input = this.$refs[inputName];
       let file = input.files[0];
       if (!!file) {
         let formData = new FormData();
         formData.append("img", file);
-        this.$http({
-          url: "/api/upload/img",
-          data: formData,
-          method: "POST"
-        })
+        uploadImg(formData)
           .then(({ data }) => {
             if (data.success) {
-              let avatarUrl = data.avatarUrl;
-              console.log(data);
+              let url = data.url;
               let oldUser = this.$store.state.user;
-              this.$store.commit(SET_USER_MUTATION,{
-                ...oldUser,
-                avatarUrl,
-              })
+              let values = {
+                //需要修改的数据的字段，值
+              };
+              if (inputName == "uploadGbImg") {
+                //上传背景图片
+                values["bg_img_url"] = url;
+                let oldUser = this.$store.state.user;
+                this.$store.commit(SET_USER_MUTATION, {
+                  ...oldUser,
+                  bgImgUrl: url
+                });
+              } else {
+                //上传头像
+                values["avatar_url"] = url;
+                let oldUser = this.$store.state.user;
+                this.$store.commit(SET_USER_MUTATION, {
+                  ...oldUser,
+                  avatarUrl: url
+                });
+              }
+              updateUserInfo({
+                id: this.userId,
+                values
+              });
             }
           })
-          .catch(() => {
-            input.files[0] = null;
+          .catch(e => {
+            console.log(e);
           });
       }
     }
@@ -124,12 +148,17 @@ export default {
       .then(({ data }) => {
         if (data.success) {
           const { user, msg } = data;
+          this.userId = user.id;
           const gender =
             user.gender == -1 ? "保密" : user.gender == 1 ? "男" : "女";
           this.$refs.form.formData = {
             ...user,
             gender
           };
+
+          this.$store.commit(SET_USER_MUTATION, {
+            ...user
+          });
         } else {
           this.$notify({
             message: msg
@@ -180,7 +209,7 @@ export default {
   right: 5px;
   top: 5px;
 }
-.upload-avatar-input {
+.upload-input {
   display: none;
 }
 .bg-img {
