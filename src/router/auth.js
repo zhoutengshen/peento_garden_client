@@ -2,7 +2,7 @@
 import store from "store/index";
 
 export const beforeEach = (to, from, next) => {
-  if (!!store.state.hasLogin&& to.path == "/login-register") { // 已经登录用户
+  if (!!store.state.hasLogin && to.path == "/login-register") { // 已经登录用户
     next("/");
     return;
   }

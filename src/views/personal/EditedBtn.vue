@@ -22,18 +22,18 @@
 export default {
   data() {
     return {
-      canEditd: true
+      canEditd: true,
     };
   },
   methods: {
     edited(val) {
-        if(val == 0){
-            this.canEditd = false;
-        }else{
-            this.canEditd = true;
-        }
-      this.$emit('edited',val);
-    }
-  }
+      if (val == 0) {
+        this.canEditd = false;
+      } else {
+        this.canEditd = true;
+      }
+      this.$emit("edited", val);
+    },
+  },
 };
 </script>

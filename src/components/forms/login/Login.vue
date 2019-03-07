@@ -57,6 +57,7 @@ import { LOGIN_ACTION } from "store/actionType";
 import PhoneCodeForm from "./PhoneCodeForm.vue";
 import EmailForm from "./EmailForm.vue";
 import PhoneNumForm from "./PhoneNumForm.vue";
+import { PUSH_CARTS_TO_SERVER_ACTION } from "store/actionType";
 
 export default {
   components: {
@@ -80,7 +81,6 @@ export default {
     changeAccountType(accountType) {
       this.accountType = accountType;
     },
-
     submitForm(obj) {
       let { password } = obj;
       // 密码登录  加密密码
@@ -93,11 +93,14 @@ export default {
         password,
         accountType: this.accountType
       };
-      // TODO
       this.$store
         .dispatch(LOGIN_ACTION, data)
         .then(({ success, msg }) => {
           if (success) {
+            //登录成功，同步本地预购数据到服务器
+            if (this.$store.state.cartItems.length > 0) {
+              this.$store.dispatch(PUSH_CARTS_TO_SERVER_ACTION);
+            }
             this.$router.push({
               name: "allProduction"
             });

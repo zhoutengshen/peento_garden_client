@@ -126,10 +126,7 @@ export default {
   },
   methods: {
     addCartItem() {
-      const fruit = {
-        ...this.fruit,
-      };
-      this.$store.commit(ADD_CART_ITEM_MUTATION, fruit.id);
+      this.$store.commit(ADD_CART_ITEM_MUTATION, this.fruit.id);
     },
   },
 };

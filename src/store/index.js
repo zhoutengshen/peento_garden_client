@@ -7,6 +7,7 @@ import {
   fetchFruits,
   login,
   logout,
+  addCarts,
 } from "api/api";
 
 import {
@@ -14,11 +15,14 @@ import {
   DEL_CART_ITEM_MUTATION,
   SET_USER_MUTATION,
   FETCH_ALL_PRODUCTIONS_MUTATION,
+  CLEAR_CART_ITEM_MUTATION,
+  PUSH_CARTS_TO_SERVER_MUTATION
 } from "./mutationType";
 import {
   LOGIN_ACTION,
   LOGOUT_ACTION,
   FETCH_ALL_PRODUCTIONS_ACTION,
+  PUSH_CARTS_TO_SERVER_ACTION,
 } from "./actionType";
 
 
@@ -77,15 +81,40 @@ const storeCfg = {
         }
       });
     },
-
+    [PUSH_CARTS_TO_SERVER_ACTION](ctx) {
+      const carts = ctx.state.cartItems;
+      addCarts(carts).then(({ data }) => {
+        if (data.fruitIds.length <= 0) {
+          ctx.commit(CLEAR_CART_ITEM_MUTATION);
+        } else {
+          data.fruitIds.forEach(id => {
+            ctx.commit(DEL_CART_ITEM_MUTATION,id);
+          });
+        }
+      })
+    }
   },
   mutations: {
+    [CLEAR_CART_ITEM_MUTATION](state) {
+      state.cartItems = [],
+        sessionStorage.setItem("cartItems", JSON.stringify([]));
+      console.log(sessionStorage.getItem("cartItems"));
+    },
     [ADD_CART_ITEM_MUTATION](state, id) {
       const cardItem = state.allFruits.find(item => item.id == id);
       if (cardItem) {
-        state.cartItems.push(cardItem);
+        const cart = state.cartItems.find(item => item.id == id);
+        if (!cart) {
+          state.cartItems.push({
+            ...cardItem,
+            num: 1
+          });
+        } else {
+          cart.num = cart.num + 1;
+        }
         const cartItemsStr = JSON.stringify(state.cartItems);
         sessionStorage.setItem("cartItems", cartItemsStr);
+        console.log(state.cartItems);
       }
     },
     [DEL_CART_ITEM_MUTATION](state, id) {
@@ -97,7 +126,7 @@ const storeCfg = {
     [SET_USER_MUTATION](state, user) {
       if (user) {
         state.hasLogin = true;
-      } else {//user == null We为注销状态
+      } else { // user == null We为注销状态
         user = {};
         state.hasLogin = false;
       }

@@ -25,7 +25,10 @@
     </el-form-item>
 
     <el-form-item label="性别" prop="gender">
-      <label v-if="!enableEdited.gender" class="inof-lable">{{formData.gender}}</label>
+      <label
+        v-if="!enableEdited.gender"
+        class="inof-lable"
+      >{{formData.gender==-1?"保密":(formData.gender==0?"女":"男")}}</label>
       <el-select
         v-if="enableEdited.gender"
         v-model="formData.gender"
@@ -107,12 +110,12 @@
 }
 </style>
 <script>
-import EditedBtn from "./EditedBtn.vue";
 import { updateUserInfo } from "api/api";
+import EditedBtn from "./EditedBtn.vue";
 
 export default {
   components: {
-    EditedBtn
+    EditedBtn,
   },
   data() {
     return {
@@ -122,132 +125,71 @@ export default {
       timer: 60, // 60秒后可以从新发送验证码
       hasSendEmailCheck: false, // 是否发送了邮箱校验
       emailCheckMsg: "发送邮件校验",
-      formData: {
-        username: "牛逼",
-        age: 0,
-        gender: "保密",
-        mobile: "13169141973",
-        email: "1724847624@qq.com",
-        realname: "zhoutengshen",
-        avatarUrl: ""
-      },
-      oddFormData: {
-        username: "牛逼",
-        age: 0,
-        gender: "保密",
-        mobile: "13169141973",
-        email: "1724847624@qq.com",
-        realname: "zhoutengshen"
-      },
+      formData: {},
       rules: {
         username: {
           type: "string",
-          required: true,
-          min: 2,
-          max: 10,
-          message: "用户名不能为空,且必须在长度为2-10",
-          trigger: "blur"
+          validator: (rule, value, callback) => {
+            this.validateUserName(value).then((result) => {
+              if (!result.pass) {
+                callback(result.msg);
+              } else {
+                callback();
+              }
+            });
+          },
+          trigger: "blur",
         },
         age: {
-          type: "number",
-          required: true,
           trigger: "blur",
           validator: (rule, value, callback) => {
-            if (!value) {
-              callback(new Error("输入不能为空"));
-              return;
-            }
-            if (!Number(value)) {
-              callback("必须为数字");
-              return;
-            }
-            if (Number(value) < 0 || Number(value) > 120) {
-              callback("必须大于0小于120");
-              return;
-            }
-            callback();
-          }
+            this.validateAge(value).then((result) => {
+              if (!result.pass) {
+                callback(result.msg);
+              } else {
+                callback();
+              }
+            });
+          },
         },
         mobile: {
           type: "string",
           required: true,
           validator: (rule, value, callback) => {
-            this.canFetchCode = false;
-            if (!value) {
-              callback("手机号码不能为空");
-              return;
-            }
-            const reg = /^1[34578]\d{9}$/;
-            if (!reg.test(value)) {
-              callback("手机号码格式错误");
-            } else {
-              if (this.formData.mobile == this.oddFormData.mobile) {
+            this.validateMobile(value).then((result) => {
+              if (result.pass) {
                 callback();
-                return;
+              } else {
+                callback(result.msg);
               }
-              this.checkMobileNum(2).then(data => {
-                if (!data.success) {
-                  // 这个手机没有绑定其他账号
-                  if (!this.hasSendCode) {
-                    callback("修改手机号码请获取验证码");
-                  } else {
-                    callback();
-                  }
-                  this.canFetchCode = true;
-                } else {
-                  // 该手机已经绑定了其他账号
-                  callback("该手机已经绑定了其他账号");
-                }
-              });
-            }
-          }
+            });
+          },
         },
         email: {
           required: true,
           type: "email",
           trigger: "blur",
           validator: (rule, value, callback) => {
-            if (!value) {
-              callback("邮箱为空");
-              return;
-            }
-            if (this.formData.email == this.oddFormData.email) {
-              callback();
-              return;
-            }
-            const reg = new RegExp(
-              "^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"
-            );
-            if (!reg.test(value)) {
-              callback("邮箱格式错误");
-              return;
-            }
-            if (this.has) {
-              return;
-            }
-            this.checkMobileNum(1).then(data => {
-              if (!data.success) {
-                // 这个邮箱没有绑定其他账号
-                if (!this.sendEmailCheck) {
-                  callback("修改邮箱前校验邮箱");
-                } else {
-                  callback();
-                }
+            this.validateEmail(value).then((result) => {
+              if (result.pass) {
+                callback();
               } else {
-                // 该手机已经绑定了其他账号
-                callback("该邮箱已经绑定了其他账号");
+                callback(result.msg);
               }
             });
-          }
+          },
         },
         realname: {
-          required: true,
-          message: "真实名字不能为空或者长度必须在2-10个字之间",
-          trigger: "blur",
-          min: 2,
-          max: 10,
-          type: "string"
-        }
+          validator: (rule, value, callback) => {
+            this.validataRealName(value).then((result) => {
+              if (result.pass) {
+                callback();
+              } else {
+                callback(result.msg);
+              }
+            });
+          },
+        },
       },
       enableEdited: {
         username: false,
@@ -255,8 +197,8 @@ export default {
         gender: false,
         mobile: false,
         email: false,
-        realname: false
-      }
+        realname: false,
+      },
     };
   },
   methods: {
@@ -267,9 +209,24 @@ export default {
         this.enableEdited.username = false;
       }
       if (val == 1) {
-        //确认
-      } else {
-        //取消
+        // 确认
+        this.validateUserName(this.formData.username).then((result) => {
+          if (result.pass) {
+            updateUserInfo({
+              values: {
+                username: this.formData.username,
+              },
+            }).then(({ data }) => {
+              if (data.success) {
+              } else {
+                this.formData.username = this.user.username;
+              }
+            });
+          }
+        });
+      } else if (val == 2) {
+        // 取消
+        this.formData.username = this.user.username;
       }
     },
     editedAge(val) {
@@ -278,15 +235,19 @@ export default {
       } else {
         this.enableEdited.age = false;
         if (val == 1) {
-          //确认
-          this.$refs.formData.validateField("email");
-          let values = {};
-          // updateUserInfo({
-          //   id: this.oddFormData.id,
-          //   values
-          // });
+          // 确认
+          updateUserInfo({
+            values: {
+              age: this.formData.age,
+            },
+          }).then(({ data }) => {
+            if (!data.success) {
+              this.formData.age = this.user.age;
+            }
+          });
         } else {
-          //取消
+          // 取消
+          this.formData.age = this.user.age;
         }
       }
     },
@@ -296,9 +257,20 @@ export default {
       } else {
         this.enableEdited.gender = false;
         if (val == 1) {
-          //确认
+          // 确认
+          updateUserInfo({
+            values: {
+              gender: this.formData.gender,
+            },
+          }).then(({ data }) => {
+            if (data.success) {
+            } else {
+              this.formData.gender = this.user.gender;
+            }
+          });
         } else {
-          //取消
+          // 取消
+          this.formData.gender = this.user.gender;
         }
       }
     },
@@ -309,9 +281,14 @@ export default {
         this.enableEdited.email = false;
       }
       if (val == 1) {
-        //确认
+        // 确认
+        this.$notify({
+          message: "当前版本暂时不支持修改邮箱",
+        });
+        this.formData.email = this.user.email;
       } else {
-        //取消
+        // 取消
+        this.formData.email = this.user.email;
       }
     },
     editedMobile(val) {
@@ -321,9 +298,15 @@ export default {
         this.enableEdited.mobile = false;
       }
       if (val == 1) {
-        //确认
+        // 确认
+        // 确认
+        this.$notify({
+          message: "当前版本暂时不支持修改手机号码",
+        });
+        this.formData.mobile = this.user.mobile;
       } else {
-        //取消
+        // 取消
+        this.formData.mobile = this.user.mobile;
       }
     },
     editedRealname(val) {
@@ -333,10 +316,127 @@ export default {
         this.enableEdited.realname = false;
       }
       if (val == 1) {
-        //确认
+        // 确认
+        updateUserInfo({
+          values: {
+            realname: this.formData.realname,
+          },
+        }).then(({ data }) => {
+          if (data.success) {
+          } else {
+            this.formData.realname = this.user.realname;
+          }
+        });
       } else {
-        //取消
+        // 取消
+        this.formData.realname = this.user.realname;
       }
+    },
+    validateUserName(username) {
+      return new Promise((resolve) => {
+        if (!username) {
+          resolve({ pass: false, msg: "用户名不能为空" });
+          return;
+        }
+        if (username.length < 2 || username.length > 16) {
+          resolve({ pass: false, msg: "用户名长度必须在2-16个字符之间" });
+          return;
+        }
+        resolve({ pass: true });
+      });
+    },
+    validateAge(val) {
+      return new Promise((resolve) => {
+        if (!val || !Number(val)) {
+          resolve({ pass: false, msg: "输入必须为数字" });
+          return;
+        }
+        const age = Number(val);
+        if (age < 0 || age > 120) {
+          resolve({ pass: false, msg: "年龄必须在0-120之间" });
+          return;
+        }
+        resov({ pass: true });
+      });
+    },
+    validateMobile(value) {
+      return new Promise((resolve) => {
+        this.canFetchCode = false;
+        if (!value) {
+          resolve({ pass: false, msg: "手机号码不能为空" });
+          return;
+        }
+        const reg = /^1[34578]\d{9}$/;
+        if (!reg.test(value)) {
+          resolve({ pass: false, msg: "手机号码格式错误" });
+        } else {
+          if (this.formData.mobile == this.user.mobile) {
+            resolve({ pass: true });
+            return;
+          }
+          this.checkMobileNum(2).then((data) => {
+            if (!data.success) {
+              // 这个手机没有绑定其他账号
+              if (!this.hasSendCode) {
+                resolve({ pass: false, msg: "修改手机号码请获取验证码" });
+              } else {
+                resolve({ pass: true });
+              }
+              this.canFetchCode = true;
+            } else {
+              // 该手机已经绑定了其他账号
+              resolve({ pass: false, msg: "该手机已经绑定了其他账号" });
+            }
+          });
+        }
+      });
+    },
+    validateEmail(value) {
+      return new Promise((resolve) => {
+        if (!value) {
+          resolve({ pass: false, msg: "邮箱为空" });
+          return;
+        }
+        if (this.formData.email == this.user.email) {
+          resolve({ pass: true });
+          return;
+        }
+        const reg = new RegExp(
+          "^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$",
+        );
+        if (!reg.test(value)) {
+          resolve({ pass: false, msg: "邮箱格式错误" });
+          return;
+        }
+        if (this.has) {
+          return;
+        }
+        this.checkMobileNum(1).then((data) => {
+          if (!data.success) {
+            // 这个邮箱没有绑定其他账号
+            if (!this.sendEmailCheck) {
+              resolve({ pass: false, msg: "修改邮箱前校验邮箱" });
+            } else {
+              resolve({ pass: true });
+            }
+          } else {
+            // 该手机已经绑定了其他账号
+            resolve({ pass: false, msg: "该邮箱已经绑定了其他账号" });
+          }
+        });
+      });
+    },
+    validataRealName(val) {
+      return new Promise((resolve) => {
+        if (!val) {
+          resolve({ pass: false, msg: "不能为空" });
+          return;
+        }
+        if (val.length < 2 || val.length > 5) {
+          resolve({ pass: false, msg: "真实姓名长度必须在2-5之间" });
+        }
+        resolve({ pass: true });
+      });
     },
     sendEmailCheck() {
       this.hasSendEmailCheck = true;
@@ -369,14 +469,24 @@ export default {
       return new Promise((resolve, reject) => {
         this.$http({
           method: "GET",
-          url: `${reqUrl}?account=${account}&accountType=${accountType}`
+          url: `${reqUrl}?account=${account}&accountType=${accountType}`,
         })
-          .then(resp => {
+          .then((resp) => {
             resolve(resp.data);
           })
           .catch(reject);
       });
-    }
-  }
+    },
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
+  mounted() {
+    this.formData = {
+      ...this.$store.getters.user,
+    };
+  },
 };
 </script>

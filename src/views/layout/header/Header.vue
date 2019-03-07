@@ -82,71 +82,71 @@ import { LOGOUT_ACTION } from "store/actionType";
 
 export default {
   components: {
-    Avatar
+    Avatar,
   },
   data() {
     return {
-      isActive: true
+      isActive: true,
     };
   },
   methods: {
     navToOrder() {
       this.$router.push({
-        name: "order"
+        name: "order",
       });
     },
     navToMycart() {
       this.$router.push({
-        name: "myCart"
+        name: "myCart",
       });
     },
     navToPersonal() {
       this.$router.push({
-        name: "personal"
+        name: "personal",
       });
     },
     logoutHandle(e) {
       e.preventDefault();
       this.$store
         .dispatch(LOGOUT_ACTION)
-        .then(resp => {
+        .then((resp) => {
           console.log(resp);
           if (resp.success) {
             this.$notify({
               message: resp.message,
-              duration: 800
+              duration: 800,
             });
             this.$router.push({
-              path: resp.location
+              path: resp.location,
             });
           } else {
             this.$notify({
               message: resp.message,
-              duration: 800
+              duration: 800,
             });
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log("注销时发生意外");
           console.log(e);
         });
-    }
+    },
   },
   computed: {
     user() {
-      let avatarUrl = require("assets/img/defaultAvatar.png");
-      let user = this.$store.getters.user;
+      const avatarUrl = require("assets/img/defaultAvatar.png");
+      let { user } = this.$store.getters;
       if (!user.avatarUrl) {
         user = {
           ...user,
-          avatarUrl
+          avatarUrl,
         };
       }
       return user;
     },
     hasLogin() {
       return this.$store.state.hasLogin;
-    }
-  }
+    },
+  },
 };
 </script>

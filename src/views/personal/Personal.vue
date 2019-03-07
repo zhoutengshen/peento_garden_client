@@ -42,7 +42,7 @@
           {{user.username}}
           <i class="el-icon-edit" style="font-size:16px;cursor:pointer"></i>
         </p>
-        <EditedForm ref="form"></EditedForm>
+        <EditedForm></EditedForm>
       </div>
     </div>
   </el-card>
@@ -69,31 +69,29 @@ export default {
       this.$refs[inputName].click();
     },
     uploadImgHandel(inputName) {
-      let input = this.$refs[inputName];
-      let file = input.files[0];
-      if (!!file) {
-        let formData = new FormData();
+      const input = this.$refs[inputName];
+      const file = input.files[0];
+      if (file) {
+        const formData = new FormData();
         formData.append("img", file);
         uploadImg(formData)
           .then(({ data }) => {
             if (data.success) {
-              let url = data.url;
-              let oldUser = this.$store.state.user;
-              let values = {
-                //需要修改的数据的字段，值
+              const { url } = data;
+              const oldUser = this.$store.state.user;
+              const values = {
+                // 需要修改的数据的字段，值
               };
               if (inputName == "uploadGbImg") {
-                //上传背景图片
-                values["bg_img_url"] = url;
-                let oldUser = this.$store.state.user;
+                // 上传背景图片
+                values.bg_img_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
                   bgImgUrl: url
                 });
               } else {
-                //上传头像
-                values["avatar_url"] = url;
-                let oldUser = this.$store.state.user;
+                // 上传头像
+                values.avatar_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
                   avatarUrl: url
@@ -149,12 +147,6 @@ export default {
         if (data.success) {
           const { user, msg } = data;
           this.userId = user.id;
-          const gender =
-            user.gender == -1 ? "保密" : user.gender == 1 ? "男" : "女";
-          this.$refs.form.formData = {
-            ...user,
-            gender
-          };
 
           this.$store.commit(SET_USER_MUTATION, {
             ...user

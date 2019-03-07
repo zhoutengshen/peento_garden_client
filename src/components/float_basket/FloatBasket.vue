@@ -18,15 +18,15 @@
       @mouseenter="showDiscFruits=true"
       :class="['disc-fruit',showDiscFruits&&count&&'disc-fruit-show'] "
     >
-      <li @click="navToProdDetail"  v-for="({id,count},fruitTitle) of fruitSummarys" :key="fruitTitle">
-        <span class="count">{{count}}</span>
+      <li @click="navToProdDetail"  v-for="cartItem of cartItems" :key="cartItem.id">
+        <span class="count">{{cartItem.num}}</span>
         <span
           class="title"
-          :title="fruitTitle"
-        >{{fruitTitle}}</span>
+          :title="cartItem.fruitTitle"
+        >{{cartItem.fruitTitle}}</span>
         <span class="reduce-increase">
-          <i @click="reduce(id)" class="iconfont icon-down"></i>
-          <i @click="increase(id)" class="iconfont icon-up"></i>
+          <i @click="reduce(cartItem.id)" class="iconfont icon-down"></i>
+          <i @click="increase(cartItem.id)" class="iconfont icon-up"></i>
         </span>
       </li>
     </ul>
@@ -151,15 +151,15 @@ export default {
   },
   methods: {
     navToProdDetail() {
-      this.$router.push({
-        name: "/prodDetail",
-      });
-      this.showDiscFruits = false;
+      // this.$router.push({
+      //   name: "/prodDetail",
+      // });
+      // this.showDiscFruits = false;
     },
     navToMyCart() {
-      this.$router.push({
-        name: "myCart",
-      });
+      // this.$router.push({
+      //   name: "myCart",
+      // });
     },
     increase(id) {
       this.$store.commit(ADD_CART_ITEM_MUTATION, id);
@@ -191,21 +191,14 @@ export default {
   },
   computed: {
     count() {
-      return this.$store.getters.cartItemsLength;
-    },
-    fruitSummarys() {
-      const result = {};
-      this.$store.state.cartItems.forEach((item) => {
-        if (result[item.fruitTitle]) {
-          result[item.fruitTitle].count += 1;
-          result[item.fruitTitle].id = item.id;
-        } else {
-          result[item.fruitTitle] = {};
-          result[item.fruitTitle].count = 1;
-          result[item.fruitTitle].id = item.id;
-        }
+      let count = 0;
+      this.$store.state.cartItems.forEach(cartItem => {
+        count = count + cartItem.num
       });
-      return result;
+      return count;
+    },
+    cartItems() {
+      return this.$store.state.cartItems
     },
     positionX() {
       return this.$store.state.floatBasketPosition.x;

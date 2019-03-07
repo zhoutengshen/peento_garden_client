@@ -61,8 +61,8 @@ export default {
       canFetchMobileCode: true,
       time: 60,
       formData: {
-        mobileNum: "",
-        pass: "",
+        mobileNum: "13233423224",
+        pass: "13233423224",
         rememberMe: false,
       },
       rules: {

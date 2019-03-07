@@ -28,7 +28,7 @@ module.exports = {
       "/public": {
         target: "http://localhost:7001/",
         ws: true,
-      }
+      },
     },
   },
 };

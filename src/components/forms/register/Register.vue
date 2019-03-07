@@ -52,7 +52,7 @@ export default {
       if (reg.test(value)) {
         if (typeof this.checkMobileNum === "function") {
           this.checkMobileNum({ account: value })
-            .then(result => {
+            .then((result) => {
               if (!result.success) {
                 this.canFetchMobileCode = true;
                 this.getCodeMsg = "发送验证码";
@@ -123,14 +123,14 @@ export default {
         mobileNum: "",
         pass: "",
         enPass: "",
-        mobileCode: ""
+        mobileCode: "",
       },
       rules: {
         mobileNum: [{ validator: mobileNumValidate, trigger: "blur" }],
         pass: [{ validator: passwordValidate, trigger: "blur" }],
         enPass: [{ validator: enPasswordValidate, trigger: "blur" }],
-        mobileCode: [{ validator: mobileCodeValidate, trigger: "blur" }]
-      }
+        mobileCode: [{ validator: mobileCodeValidate, trigger: "blur" }],
+      },
     };
   },
   methods: {
@@ -154,20 +154,20 @@ export default {
         that
           .$http({
             url: `/api/mobilecode?mobileNum=${that.formData.mobileNum}`,
-            method: "get"
+            method: "get",
           })
           .then(({ data }) => {
             if (data.success) {
               that.$notify({
                 title: "",
                 message: "发送成功",
-                duration: 2000
+                duration: 2000,
               });
             } else {
               that.$notify({
                 title: "",
                 message: "发送失败",
-                duration: 2000
+                duration: 2000,
               });
             }
           });
@@ -178,25 +178,25 @@ export default {
       if (!this.hasGetCode) {
         this.$notify({
           message: "请先获取验证码",
-          duration: 2000
+          duration: 2000,
         });
         return;
       }
-      this.$refs.form.validate(isOk => {
+      this.$refs.form.validate((isOk) => {
         if (isOk) {
           register(this.formData).then(({ data }) => {
             if (data.success) {
-              this.$router.push({ path: "/login-register",query:{ft:0} }); // 跳转到登录页
+              this.$router.push({ path: "/login-register", query: { ft: 0 } }); // 跳转到登录页
               this.$notify({
-                message:"注册成功",
-              })
+                message: "注册成功",
+              });
             } else {
               this.$notify({
                 message: data.msg,
-                duration: 2000
+                duration: 2000,
               });
             }
-          }).catch(e=>{
+          }).catch((e) => {
             console.log(e);
           });
         }
@@ -209,14 +209,14 @@ export default {
       return new Promise((resolve, reject) => {
         this.$http({
           method: "GET",
-          url: `${reqUrl}?account=${account}&accountType=${accountType}`
+          url: `${reqUrl}?account=${account}&accountType=${accountType}`,
         })
-          .then(resp => {
+          .then((resp) => {
             resolve(resp.data);
           })
           .catch(reject);
       });
-    }
-  }
+    },
+  },
 };
 </script>
