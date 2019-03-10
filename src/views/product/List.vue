@@ -24,7 +24,9 @@ export default {
     FruitItem,
   },
   data() {
-    return {};
+    return {
+      total: "",
+    };
   },
   methods: {},
   mounted() {

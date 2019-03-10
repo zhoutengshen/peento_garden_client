@@ -88,7 +88,6 @@
   height: 100%;
   width: 100%;
   padding: 20px;
-  padding-top: 100px;
 }
 .info > div {
   flex: 1;
@@ -218,6 +217,7 @@ export default {
               },
             }).then(({ data }) => {
               if (data.success) {
+                console.log("");
               } else {
                 this.formData.username = this.user.username;
               }
@@ -264,6 +264,7 @@ export default {
             },
           }).then(({ data }) => {
             if (data.success) {
+              console.log("");
             } else {
               this.formData.gender = this.user.gender;
             }
@@ -323,6 +324,7 @@ export default {
           },
         }).then(({ data }) => {
           if (data.success) {
+            console.log("");
           } else {
             this.formData.realname = this.user.realname;
           }
@@ -356,7 +358,7 @@ export default {
           resolve({ pass: false, msg: "年龄必须在0-120之间" });
           return;
         }
-        resov({ pass: true });
+        resolve({ pass: true });
       });
     },
     validateMobile(value) {

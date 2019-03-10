@@ -29,3 +29,7 @@ body{
     transform: scaleX(1);
     transform-origin: bottom left;
   }
+  /* overwrite element-ui css */
+  .el-select{
+    width:100%;
+  }

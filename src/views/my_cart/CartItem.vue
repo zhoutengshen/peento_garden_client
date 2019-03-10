@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <el-checkbox v-model="cart.select" style="width:0px;vertical-align:top"></el-checkbox>
     <img class="img" :src="cart.fruitImgUrl">
     <div class="title">
       <a>{{cart.fruitTitle}}</a>
@@ -8,6 +9,7 @@
     <div class="price">
       <p>￥{{cart.price}}</p>
       <i>￥{{cart.originalPrice}}</i>
+      <span>规格：{{cart.unit}}</span>
     </div>
     <div class="change-num-wapper">
       <div class="change-num">
@@ -26,8 +28,7 @@
 </template>
 
 <script>
-import { CLEAR_CART_ITEM_MUTATION } from "store/mutationType";
-import { updateCart,deleteCart } from "api/api";
+import { updateCart, deleteCart } from "api/api";
 
 export default {
   props: {
@@ -46,22 +47,34 @@ export default {
     reduce() {
       if (this.cart.num > 0) {
         this.cart.num -= 1;
+        const { num } = this.cart;
+        const values = { num };
+        updateCart({ id: this.cart.id, values });
       }
-      updateCart({ id: this.cart.id, num: this.cart.num });
     },
     increase() {
       this.cart.num += 1;
-      updateCart({ id: this.cart.id, num: this.cart.num });
+      const { num } = this.cart;
+      const values = { num };
+      updateCart({ id: this.cart.id, values });
     },
     delCart(id) {
-      deleteCart(id).then(({data})=>{
-        if(data.success){
-          this.$notify({
-            message:"移除成功",
-          });
-          this.$emit('remove',id);
-        }
-      }).catch((e)=>{console.log(e)})
+      deleteCart(id)
+        .then(({ data }) => {
+          if (data.success) {
+            this.$notify({
+              message: "移除成功"
+            });
+
+            if (this.cart.select) {
+              this.$emit("updateFatherTotal", -this.total);
+            }
+            this.$emit("remove", id);
+          }
+        })
+        .catch(e => {
+          console.log(e);
+        });
     }
   },
   computed: {
@@ -69,26 +82,45 @@ export default {
       return Number(this.cart.price) * Number(this.cart.num);
     }
   },
-  mounted() {}
+  mounted() {
+    if (this.cart.select) {
+      this.$emit("updateFatherTotal", this.total);
+    }
+  },
+  watch: {
+    total(newVal, oddVal) {
+      if (this.cart.select) {
+        this.$emit("updateFatherTotal", newVal - oddVal);
+      }
+    },
+    ["cart.select"]: function(newVal) {
+      updateCart({ id: this.cart.id, values: { select: newVal } });
+      if (newVal) {
+        this.$emit("updateFatherTotal", this.total);
+      } else {
+        this.$emit("updateFatherTotal", -this.total);
+      }
+    }
+  }
 };
 </script>
 <style scoped>
 .container {
   position: relative;
-  height: 160px;
+  height: 100px;
   display: flex;
-  margin: 20px;
+  margin: 5px 0;
 }
 .container > div {
   display: inline-block;
   width: 200px;
   text-align: center;
   vertical-align: top;
-  padding-top: 60px;
+  padding-top: 20px;
 }
 .img {
-  width: 160px;
-  height: 160px;
+  width: 100px;
+  height: 100px;
 }
 .title {
   height: 100%;
@@ -125,7 +157,7 @@ export default {
 .price > i {
   display: block;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
   text-decoration: line-through;
   color: #909399;
 }
@@ -137,7 +169,7 @@ export default {
   display: inline-block;
   width: 200px;
   text-align: center;
-  padding-top: 80px !important;
+  padding-top: 40px !important;
 }
 .increase {
   display: inline-block;
@@ -187,4 +219,3 @@ export default {
   color: red;
 }
 </style>
-

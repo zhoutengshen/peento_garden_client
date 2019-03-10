@@ -42,26 +42,36 @@
           {{user.username}}
           <i class="el-icon-edit" style="font-size:16px;cursor:pointer"></i>
         </p>
-        <EditedForm></EditedForm>
+        <el-tabs class="tab" :stretch="true" v-model="activeTabName">
+          <el-tab-pane label="修改个人信息" name="tabInfo">
+            <EditedUserInfoForm></EditedUserInfoForm>
+          </el-tab-pane>
+          <el-tab-pane label="修改收货地址" name="tabAdress">
+            <EditedUserAdressForm></EditedUserAdressForm>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </div>
   </el-card>
 </template>
 <script>
-import EditedForm from "views/personal/EditedForm.vue";
+import EditedUserInfoForm from "views/personal/EditedUserInfoForm.vue";
+import EditedUserAdressForm from "views/personal/EditedUserAdressForm.vue";
 import { fetchUserInfo, updateUserInfo, uploadImg } from "api/api";
 import { SET_USER_MUTATION } from "store/mutationType";
 
 export default {
   components: {
-    EditedForm
+    EditedUserInfoForm,
+    EditedUserAdressForm,
   },
   data() {
     return {
       showCarousel: false,
       userId: "",
       enSureUpdateAvata: true,
-      bgImgUrl: ""
+      bgImgUrl: "",
+      activeTabName: "tabInfo",
     };
   },
   methods: {
@@ -87,27 +97,27 @@ export default {
                 values.bg_img_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
-                  bgImgUrl: url
+                  bgImgUrl: url,
                 });
               } else {
                 // 上传头像
                 values.avatar_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
-                  avatarUrl: url
+                  avatarUrl: url,
                 });
               }
               updateUserInfo({
                 id: this.userId,
-                values
+                values,
               });
             }
           })
-          .catch(e => {
+          .catch((e) => {
             console.log(e);
           });
       }
-    }
+    },
   },
   computed: {
     user() {
@@ -118,18 +128,18 @@ export default {
         {
           id: "img1",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-3.d59ac68c.jpg"
+            "https://static.zhihu.com/heifetz/assets/guide-cover-3.d59ac68c.jpg",
         },
         {
           id: "igm2",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-4.5518ba1a.jpg"
+            "https://static.zhihu.com/heifetz/assets/guide-cover-4.5518ba1a.jpg",
         },
         {
           id: "img3",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-5.2b2adaeb.jpg"
-        }
+            "https://static.zhihu.com/heifetz/assets/guide-cover-5.2b2adaeb.jpg",
+        },
       ];
       return imgs;
     },
@@ -139,31 +149,30 @@ export default {
       }
       const avatarUrl = require("assets/img/defaultAvatar.png");
       return avatarUrl;
-    }
+    },
   },
   mounted() {
     fetchUserInfo()
       .then(({ data }) => {
+        const { user, msg } = data;
         if (data.success) {
-          const { user, msg } = data;
           this.userId = user.id;
-
           this.$store.commit(SET_USER_MUTATION, {
-            ...user
+            ...user,
           });
         } else {
           this.$notify({
-            message: msg
+            message: msg,
           });
         }
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
         this.$notify({
-          message: "获取用户数据出错"
+          message: "获取用户数据出错",
         });
       });
-  }
+  },
 };
 </script>
 <style scoped>
@@ -215,9 +224,13 @@ export default {
 }
 .container {
   box-sizing: border-box;
-  padding-left: 200px;
+  padding: 0 100px 0 200px;
   width: 100%;
   height: 100%;
+}
+.tab {
+  padding-top: 100px;
+  width: 100%;
 }
 .header > span {
   position: absolute;

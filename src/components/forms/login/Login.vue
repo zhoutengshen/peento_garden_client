@@ -54,16 +54,16 @@
 </style>
 <script>
 import { LOGIN_ACTION } from "store/actionType";
+import { PUSH_CARTS_TO_SERVER_ACTION } from "store/actionType";
 import PhoneCodeForm from "./PhoneCodeForm.vue";
 import EmailForm from "./EmailForm.vue";
 import PhoneNumForm from "./PhoneNumForm.vue";
-import { PUSH_CARTS_TO_SERVER_ACTION } from "store/actionType";
 
 export default {
   components: {
     PhoneCodeForm,
     PhoneNumForm,
-    EmailForm
+    EmailForm,
   },
   data() {
     return {
@@ -73,8 +73,8 @@ export default {
         email: 1,
         mobileNum: 2,
         account: 3,
-        mobileCode: 4
-      }
+        mobileCode: 4,
+      },
     };
   },
   methods: {
@@ -91,30 +91,30 @@ export default {
       const data = {
         ...obj,
         password,
-        accountType: this.accountType
+        accountType: this.accountType,
       };
       this.$store
         .dispatch(LOGIN_ACTION, data)
         .then(({ success, msg }) => {
           if (success) {
-            //登录成功，同步本地预购数据到服务器
+            // 登录成功，同步本地预购数据到服务器
             if (this.$store.state.cartItems.length > 0) {
               this.$store.dispatch(PUSH_CARTS_TO_SERVER_ACTION);
             }
             this.$router.push({
-              name: "allProduction"
+              name: "allProduction",
             });
           } else {
             this.$notify({
               message: msg,
-              dulation: 2000
+              dulation: 2000,
             });
           }
         })
         .catch(() => {
           this.$notify({
             message: "登录失败",
-            dulation: 2000
+            dulation: 2000,
           });
         });
     },
@@ -128,15 +128,15 @@ export default {
       return new Promise((resolve, reject) => {
         this.$http({
           method: "GET",
-          url: `${reqUrl}?account=${account}&accountType=${accountType}`
+          url: `${reqUrl}?account=${account}&accountType=${accountType}`,
         })
-          .then(resp => {
+          .then((resp) => {
             resolve(resp.data);
           })
           .catch(reject);
       });
-    }
+    },
   },
-  created() {}
+  created() {},
 };
 </script>

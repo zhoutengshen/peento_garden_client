@@ -18,12 +18,9 @@
       @mouseenter="showDiscFruits=true"
       :class="['disc-fruit',showDiscFruits&&count&&'disc-fruit-show'] "
     >
-      <li @click="navToProdDetail"  v-for="cartItem of cartItems" :key="cartItem.id">
+      <li @click="navToProdDetail" v-for="cartItem of cartItems" :key="cartItem.id">
         <span class="count">{{cartItem.num}}</span>
-        <span
-          class="title"
-          :title="cartItem.fruitTitle"
-        >{{cartItem.fruitTitle}}</span>
+        <span class="title" :title="cartItem.fruitTitle">{{cartItem.fruitTitle}}</span>
         <span class="reduce-increase">
           <i @click="reduce(cartItem.id)" class="iconfont icon-down"></i>
           <i @click="increase(cartItem.id)" class="iconfont icon-up"></i>
@@ -142,6 +139,7 @@ import {
   DEL_CART_ITEM_MUTATION,
 } from "store/mutationType";
 import lodash from "lodash";
+import { updateCart } from "api/api";
 
 export default {
   data() {
@@ -163,9 +161,20 @@ export default {
     },
     increase(id) {
       this.$store.commit(ADD_CART_ITEM_MUTATION, id);
+      if (this.$store.state.hasLogin) {
+        // 登录用户
+        updateCart({ id, num: 1 });
+      }
     },
     reduce(id) {
       this.$store.commit(DEL_CART_ITEM_MUTATION, id);
+      if (this.$store.state.hasLogin) {
+        // 登录用户
+        const cart = this.$store.allFruits.find(item => item.id);
+        if (cart) {
+          addCarts([{ ...cart, num: 1 }]);
+        }
+      }
     },
     move() {
       document.onmousemove = (e) => {
@@ -192,13 +201,13 @@ export default {
   computed: {
     count() {
       let count = 0;
-      this.$store.state.cartItems.forEach(cartItem => {
-        count = count + cartItem.num
+      this.$store.state.cartItems.forEach((cartItem) => {
+        count += cartItem.num;
       });
       return count;
     },
     cartItems() {
-      return this.$store.state.cartItems
+      return this.$store.state.cartItems;
     },
     positionX() {
       return this.$store.state.floatBasketPosition.x;

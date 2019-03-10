@@ -1,11 +1,8 @@
 <template>
-    <h1>ORDER</h1>
+  <h1>我的订单页</h1>
 </template>
-<style scoped>
-</style>
-
 <script>
-export default {
-
-};
+export default {};
 </script>
+<style lang="scss" scoped>
+</style>

@@ -16,7 +16,7 @@ import {
   SET_USER_MUTATION,
   FETCH_ALL_PRODUCTIONS_MUTATION,
   CLEAR_CART_ITEM_MUTATION,
-  PUSH_CARTS_TO_SERVER_MUTATION
+  PUSH_CARTS_TO_SERVER_MUTATION,
 } from "./mutationType";
 import {
   LOGIN_ACTION,
@@ -87,17 +87,17 @@ const storeCfg = {
         if (data.fruitIds.length <= 0) {
           ctx.commit(CLEAR_CART_ITEM_MUTATION);
         } else {
-          data.fruitIds.forEach(id => {
-            ctx.commit(DEL_CART_ITEM_MUTATION,id);
+          data.fruitIds.forEach((id) => {
+            ctx.commit(DEL_CART_ITEM_MUTATION, id);
           });
         }
-      })
-    }
+      });
+    },
   },
   mutations: {
     [CLEAR_CART_ITEM_MUTATION](state) {
       state.cartItems = [],
-        sessionStorage.setItem("cartItems", JSON.stringify([]));
+      sessionStorage.setItem("cartItems", JSON.stringify([]));
       console.log(sessionStorage.getItem("cartItems"));
     },
     [ADD_CART_ITEM_MUTATION](state, id) {
@@ -107,10 +107,10 @@ const storeCfg = {
         if (!cart) {
           state.cartItems.push({
             ...cardItem,
-            num: 1
+            num: 1,
           });
         } else {
-          cart.num = cart.num + 1;
+          cart.num += 1;
         }
         const cartItemsStr = JSON.stringify(state.cartItems);
         sessionStorage.setItem("cartItems", cartItemsStr);

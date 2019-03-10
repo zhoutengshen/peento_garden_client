@@ -107,6 +107,7 @@
 
 <script>
 import { ADD_CART_ITEM_MUTATION } from "store/mutationType";
+import { addCarts } from "api/api";
 
 export default {
   props: {
@@ -127,6 +128,13 @@ export default {
   methods: {
     addCartItem() {
       this.$store.commit(ADD_CART_ITEM_MUTATION, this.fruit.id);
+      const cart = {
+        ...this.fruit,
+        num: 1,
+      };
+      addCarts([{ ...cart }]).then(({ data }) => {
+        console.log(data);
+      });
     },
   },
 };

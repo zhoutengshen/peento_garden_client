@@ -51,29 +51,67 @@ export const fetchMyCartInfo = () => axios({
   method: "GET",
 });
 
-export const addCarts = (carts) => {
+export const addCarts = carts => axios({
+  url: "/api/cart/carts",
+  method: "POST",
+  data: {
+    carts,
+  },
+});
+
+export const updateCart = ({ id, values }) => {
+  console.log(values);
   return axios({
     url: "/api/cart/carts",
-    method: "POST",
+    method: "PUT",
     data: {
-      carts
+      id,
+      values,
     },
   });
-}
-export const updateCart = ({id,num})=>{
-  return axios({
-    url:"/api/cart/carts",
-    method:"PUT",
-    data:{
-      id,
-      num,
-    }
-  });
-}
+};
 
-export const deleteCart = (id)=>{
-  return axios({
-    url:`/api/cart/carts/${id}`,
-    method:"DELETE"
-  })
-}
+export const deleteCart = id => axios({
+  url: `/api/cart/carts/${id}`,
+  method: "DELETE",
+});
+
+export // 提交购物车选中的商品，生成订单
+const postOrder = carts => axios({
+  url: "/api/order",
+  method: "POST",
+  data: carts,
+});
+
+
+export const getProvinces = () => axios({
+  url: "/api/city/province",
+  method: "GET",
+});
+export const getCities = id => axios({
+  url: `/api/city/city/${id}`,
+  method: "GET",
+});
+export const getAreas = id => axios({
+  url: `/api/city/area/${id}`,
+  method: "GET",
+});
+export const getAddress = () => axios({
+  url: "/api/address",
+  method: "GET",
+});
+
+export const putAddress = ({ values }) => axios({
+  url: "/api/address",
+  method: "PUT",
+  data: {
+    values,
+  },
+});
+export const postAddress = ({ values }) => axios({
+  url: "/api/address",
+  method: "POST",
+  data: {
+    values,
+  },
+});

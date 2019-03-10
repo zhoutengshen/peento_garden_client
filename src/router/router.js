@@ -6,7 +6,7 @@ const FruitsList = () => import("views/product/List.vue");
 const LoginRegister = () => import("views/login_register/LoginRegister.vue");
 const Personal = () => import("views/personal/Personal.vue");
 const MyCart = () => import("views/my_cart/MyCart.vue");
-const Order = () => import("views/order/Order.vue");
+const Order = () => import("views/order/PostOrder.vue");
 const ProductionDetail = () => import("views/product_detail/ProductionDetail.vue");
 const routerCfg = {
   routes: [
@@ -36,8 +36,8 @@ const routerCfg = {
         requiresAuth: true,
       },
     }, {
-      path: "/order",
-      name: "order",
+      path: "/post-order",
+      name: "postOrder",
       component: Order,
       meta: {
         requiresAuth: true,
@@ -46,6 +46,10 @@ const routerCfg = {
       path: "/production-detail",
       name: "prodDetail",
       component: ProductionDetail,
+    }, {
+      path: "/order",
+      name: "order",
+      component: () => import("views/order/Order.vue"),
     },
   ],
 };
