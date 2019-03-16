@@ -77,11 +77,11 @@ export const deleteCart = id => axios({
 });
 
 export // 提交购物车选中的商品，生成订单
-const postOrder = carts => axios({
-  url: "/api/order",
-  method: "POST",
-  data: carts,
-});
+  const postOrder = carts => axios({
+    url: "/api/order",
+    method: "POST",
+    data: carts,
+  });
 
 
 export const getProvinces = () => axios({
