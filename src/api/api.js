@@ -10,6 +10,7 @@ export const fetchFruits = ({ limit, offset }) => axios({
   url: `/api/fruit/list?limit=${limit}&offset=${offset}`,
   method: "GET",
 });
+
 export const login = data => axios({
   url: "/api/login",
   method: "POST",
@@ -28,6 +29,7 @@ export const register = (data) => {
     data: result,
   });
 };
+
 export const logout = () => axios({
   url: "/api/logout",
   method: "GET",
@@ -75,13 +77,12 @@ export const deleteCart = id => axios({
   url: `/api/cart/carts/${id}`,
   method: "DELETE",
 });
-
-export // 提交购物车选中的商品，生成订单
-  const postOrder = carts => axios({
-    url: "/api/order",
-    method: "POST",
-    data: carts,
-  });
+// 提交购物车选中的商品，生成订单
+export const postOrder = carts => axios({
+  url: "/api/order",
+  method: "POST",
+  data: carts,
+});
 
 
 export const getProvinces = () => axios({

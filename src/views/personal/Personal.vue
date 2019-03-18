@@ -63,7 +63,7 @@ import { SET_USER_MUTATION } from "store/mutationType";
 export default {
   components: {
     EditedUserInfoForm,
-    EditedUserAdressForm,
+    EditedUserAdressForm
   },
   data() {
     return {
@@ -71,7 +71,7 @@ export default {
       userId: "",
       enSureUpdateAvata: true,
       bgImgUrl: "",
-      activeTabName: "tabInfo",
+      activeTabName: "tabInfo"
     };
   },
   methods: {
@@ -97,27 +97,27 @@ export default {
                 values.bg_img_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
-                  bgImgUrl: url,
+                  bgImgUrl: url
                 });
               } else {
                 // 上传头像
                 values.avatar_url = url;
                 this.$store.commit(SET_USER_MUTATION, {
                   ...oldUser,
-                  avatarUrl: url,
+                  avatarUrl: url
                 });
               }
               updateUserInfo({
                 id: this.userId,
-                values,
+                values
               });
             }
           })
-          .catch((e) => {
+          .catch(e => {
             console.log(e);
           });
       }
-    },
+    }
   },
   computed: {
     user() {
@@ -128,18 +128,18 @@ export default {
         {
           id: "img1",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-3.d59ac68c.jpg",
+            "https://static.zhihu.com/heifetz/assets/guide-cover-3.d59ac68c.jpg"
         },
         {
           id: "igm2",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-4.5518ba1a.jpg",
+            "https://static.zhihu.com/heifetz/assets/guide-cover-4.5518ba1a.jpg"
         },
         {
           id: "img3",
           src:
-            "https://static.zhihu.com/heifetz/assets/guide-cover-5.2b2adaeb.jpg",
-        },
+            "https://static.zhihu.com/heifetz/assets/guide-cover-5.2b2adaeb.jpg"
+        }
       ];
       return imgs;
     },
@@ -149,7 +149,7 @@ export default {
       }
       const avatarUrl = require("assets/img/defaultAvatar.png");
       return avatarUrl;
-    },
+    }
   },
   mounted() {
     fetchUserInfo()
@@ -158,21 +158,21 @@ export default {
         if (data.success) {
           this.userId = user.id;
           this.$store.commit(SET_USER_MUTATION, {
-            ...user,
+            ...user
           });
         } else {
           this.$notify({
-            message: msg,
+            message: msg
           });
         }
       })
-      .catch((e) => {
+      .catch(e => {
         console.log(e);
         this.$notify({
-          message: "获取用户数据出错",
+          message: "获取用户数据出错"
         });
       });
-  },
+  }
 };
 </script>
 <style scoped>
